@@ -8,14 +8,15 @@ app.use(express.json({ limit: '1mb' }));
 // INLINED: Ollama client functions (from prompt-rater/lib/ollama.js)
 // ============================================================================
 
-const DEFAULT_BASE = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+const DEFAULT_BASE = process.env.OLLAMA_BASE_URL || 'https://ollama.com';
 const DEFAULT_MODEL = process.env.OLLAMA_MODEL || 'gpt-oss:120b';
+const DEFAULT_API_KEY = process.env.OLLAMA_API_KEY || 'a50e08db3d2c4172b5ce9d55939038a1.3Rp7gRwq_KXffrW7MztD8D4H';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function resolveConfig(overrides = {}) {
   const baseUrl = (overrides.baseUrl || DEFAULT_BASE).trim().replace(/\/+$/, '');
-  const apiKey = ((overrides.apiKey || '').trim()) || process.env.OLLAMA_API_KEY || '';
+  const apiKey = ((overrides.apiKey || '').trim()) || process.env.OLLAMA_API_KEY || DEFAULT_API_KEY;
   const model = (overrides.model || DEFAULT_MODEL).trim();
   return { baseUrl, apiKey, model };
 }
