@@ -1,7 +1,8 @@
 {
   "name": "prompt-testing",
   "version": "1.0.0",
-  "description": "Chapter 08 - Prompt Testing & Evaluation (Prompt Rater + Prompt Test Suite)",
+  "type": "module",
+  "description": "Chapter 08 - Prompt Testing & Evaluation (Prompt Rater)",
   "main": "api/index.js",
   "scripts": {
     "start": "node server.js",
@@ -16,3 +17,4 @@
     "node-fetch": "^3.3.0"
   }
 }
+
