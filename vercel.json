@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "npm install",
   "builds": [
     {
       "src": "api/index.js",
@@ -13,4 +14,5 @@
     }
   ]
 }
+
 
