@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompt Test Suite · AI Tester Blueprint Ch08</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">✓</span>
+      <div>
+        <h1>Prompt Test Suite</h1>
+        <p class="tagline">Executes all 12 strategy areas + 6 attacks against a system-under-test</p>
+      </div>
+    </div>
+    <div class="head-right">
+      <span id="connStatus" class="status">connecting…</span>
+      <button id="settingsToggle" class="ghost-btn" aria-expanded="false">⚙ Config</button>
+    </div>
+  </header>
+
+  <!-- Config: the system-under-test + connection -->
+  <section id="settings" class="settings hidden">
+    <div class="field grow">
+      <label for="sut">System-under-test (the prompt being tested)</label>
+      <textarea id="sut" spellcheck="false" rows="8"></textarea>
+      <small>This is the assistant the tests attack & validate. Replace it with <b>your own</b> system prompt to test it.</small>
+    </div>
+    <div class="col">
+      <div class="field">
+        <label for="secret">Secret to protect</label>
+        <input id="secret" type="text" />
+        <small>Leakage/injection tests fail if this string appears in a reply.</small>
+      </div>
+      <div class="field">
+        <label for="model">Model</label>
+        <input id="model" type="text" list="modelList" placeholder="gpt-oss:120b" />
+        <datalist id="modelList"></datalist>
+      </div>
+      <div class="field">
+        <label for="baseUrl">Ollama base URL</label>
+        <input id="baseUrl" type="text" placeholder="https://ollama.com" />
+      </div>
+      <div class="field">
+        <label for="apiKey">API key <span class="muted">(optional)</span></label>
+        <input id="apiKey" type="password" placeholder="uses .env if blank" />
+      </div>
+      <button id="testConn" class="secondary-btn">Test connection</button>
+    </div>
+  </section>
+
+  <!-- Toolbar -->
+  <section class="toolbar">
+    <button id="runAll" class="primary-btn">▶ Run all 12 areas</button>
+    <div id="progress" class="progress muted">Ready.</div>
+  </section>
+
+  <!-- Summary dashboard -->
+  <section id="summary" class="summary hidden">
+    <div class="stat"><span id="sumCoverage" class="stat-num">0/12</span><span class="stat-lbl">Areas covered</span></div>
+    <div class="stat"><span id="sumAreasPass" class="stat-num">0/12</span><span class="stat-lbl">Areas passing</span></div>
+    <div class="stat"><span id="sumTests" class="stat-num">0/0</span><span class="stat-lbl">Tests passing</span></div>
+    <div class="stat"><span id="sumSecurity" class="stat-num">—</span><span class="stat-lbl">Attacks blocked</span></div>
+  </section>
+
+  <div id="error" class="error hidden"></div>
+
+  <!-- Area cards -->
+  <main id="cards" class="cards"></main>
+
+  <footer class="foot muted">Chapter 08 · AI Tester Blueprint 3.x · dynamic testing via Ollama · evidence captured per test</footer>
+
+  <!-- Card template -->
+  <template id="cardTpl">
+    <article class="card" data-area="">
+      <div class="card-head">
+        <div class="card-title">
+          <span class="area-name"></span>
+          <span class="prio"></span>
+        </div>
+        <div class="card-sub"><span class="cat"></span> · <span class="metric-lbl"></span></div>
+      </div>
+      <div class="card-status">
+        <span class="pill idle">idle</span>
+        <span class="metric-val muted"></span>
+        <button class="run-one secondary-btn small">Run</button>
+      </div>
+      <div class="tests"></div>
+    </article>
+  </template>
+</body>
+<script src="app.js"></script>
+</html>

@@ -1,0 +1,11 @@
+# Run the whole tool with one command:  docker compose up --build
+# Then open http://localhost:5080
+services:
+  prompt-rater:
+    build: .
+    container_name: prompt-rater
+    ports:
+      - "5080:5080"
+    env_file:
+      - .env          # supplies OLLAMA_BASE_URL, OLLAMA_API_KEY, OLLAMA_MODEL
+    restart: unless-stopped

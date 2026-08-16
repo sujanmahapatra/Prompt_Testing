@@ -1,0 +1,10 @@
+# Run everything:  docker compose up --build   ->  http://localhost:5090
+services:
+  prompt-test-suite:
+    build: .
+    container_name: prompt-test-suite
+    ports:
+      - "5090:5090"
+    env_file:
+      - .env
+    restart: unless-stopped

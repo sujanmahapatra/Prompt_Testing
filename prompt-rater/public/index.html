@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompt Rater · AI Tester Blueprint Ch08</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">◑</span>
+      <div>
+        <h1>Prompt Rater</h1>
+        <p class="tagline">Paste any prompt · get a 12-point score · get fixes</p>
+      </div>
+    </div>
+    <button id="settingsToggle" class="ghost-btn" aria-expanded="false">⚙ Settings</button>
+  </header>
+
+  <!-- Settings / Ollama connection -->
+  <section id="settings" class="settings hidden">
+    <div class="field">
+      <label for="baseUrl">Ollama base URL</label>
+      <input id="baseUrl" type="text" placeholder="http://localhost:11434" />
+      <small>Local Ollama needs no key. For Ollama Cloud use <code>https://ollama.com</code> + a key.</small>
+    </div>
+    <div class="field">
+      <label for="apiKey">API key <span class="muted">(optional)</span></label>
+      <input id="apiKey" type="password" placeholder="only for Ollama Cloud / secured servers" />
+    </div>
+    <div class="field">
+      <label for="model">Model</label>
+      <input id="model" type="text" list="modelList" placeholder="llama3.1:8b" />
+      <datalist id="modelList"></datalist>
+      <small>Pick one you've pulled (<code>ollama pull gpt-oss:20b</code>). Bigger = better ratings.</small>
+    </div>
+    <div class="field field-actions">
+      <button id="testConn" class="secondary-btn">Test connection</button>
+      <span id="connStatus" class="status">—</span>
+    </div>
+  </section>
+
+  <main class="layout">
+    <!-- Input -->
+    <section class="panel input-panel">
+      <div class="panel-head">
+        <h2>Your prompt</h2>
+        <div class="examples">
+          <span class="muted">Try:</span>
+          <button class="chip" data-example="weak">Weak prompt</button>
+          <button class="chip" data-example="decent">Decent prompt</button>
+          <button class="chip" data-example="risky">Injection-prone</button>
+        </div>
+      </div>
+      <textarea id="promptInput" spellcheck="false"
+        placeholder="Paste the prompt you want to test here…&#10;&#10;e.g. 'You are a support bot. Answer the user's question.'"></textarea>
+      <div class="input-foot">
+        <span id="charCount" class="muted">0 chars</span>
+        <button id="analyzeBtn" class="primary-btn">Rate this prompt</button>
+      </div>
+    </section>
+
+    <!-- Output -->
+    <section class="panel output-panel">
+      <div id="placeholder" class="placeholder">
+        <div class="placeholder-ring">12</div>
+        <p>Your score across the 12 prompt-testing dimensions will appear here.</p>
+      </div>
+
+      <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p id="loadingText">Rating your prompt…</p>
+        <small id="loadingTimer">0.0s</small>
+      </div>
+
+      <div id="error" class="error hidden"></div>
+
+      <div id="results" class="results hidden">
+        <div class="score-hero">
+          <div class="score-ring" id="scoreRing">
+            <span id="overallScore">–</span><small>/100</small>
+          </div>
+          <div class="score-meta">
+            <h2 id="verdict">—</h2>
+            <p id="summary" class="muted"></p>
+            <span id="usedModel" class="pill"></span>
+          </div>
+        </div>
+
+        <div class="block">
+          <h3>Top recommendations</h3>
+          <ol id="topRecs" class="top-recs"></ol>
+        </div>
+
+        <div class="block">
+          <h3>Scores by dimension</h3>
+          <div id="dimensions" class="dim-grid"></div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">
+            <h3>Improved prompt</h3>
+            <button id="copyImproved" class="secondary-btn small">Copy</button>
+          </div>
+          <pre id="improvedPrompt" class="improved"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot muted">
+    Chapter 08 · AI Tester Blueprint 3.x · runs fully local via Ollama
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

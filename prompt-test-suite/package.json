@@ -1,0 +1,16 @@
+{
+  "name": "prompt-test-suite",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Local dynamic prompt-testing suite: executes real tests for all 12 strategy areas + 6 attacks against a system-under-test via Ollama, with metrics, evidence, and a live dashboard.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": { "node": ">=18.17.0" },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
