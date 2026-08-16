@@ -1,15 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
-
-// Serve static files from prompt-rater/public
-app.use(express.static(path.join(__dirname, 'prompt-rater/public')));
 
 // ============================================================================
 // INLINED: Ollama client functions (from prompt-rater/lib/ollama.js)
@@ -189,16 +182,121 @@ app.post('/api/analyze', async (req, res) => {
   }
 });
 
-// Serve SPA
+// Serve the HTML UI
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'prompt-rater/public/index.html'));
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prompt Rater</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #fff; }
+    .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    textarea { width: 100%; height: 200px; padding: 1rem; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 8px; font-family: monospace; }
+    button { padding: 0.75rem 1.5rem; background: #0070f3; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 1rem; }
+    button:hover { background: #0051cc; }
+    .loading { display: none; margin-top: 2rem; }
+    .spinner { border: 4px solid #333; border-top: 4px solid #0070f3; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .results { margin-top: 2rem; }
+    .score { font-size: 2rem; font-weight: bold; color: #0070f3; }
+    .error { color: #ff4444; background: #1a0000; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+    .success { color: #44ff44; background: #001a00; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Prompt Rater</h1>
+    <p>Paste a prompt and get AI-based scoring on 12 dimensions (Quality, Behavior, Security).</p>
+    
+    <textarea id="prompt" placeholder="Paste your prompt here..."></textarea>
+    <button onclick="analyzePrompt()">Rate this Prompt</button>
+    
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Analyzing...</p>
+    </div>
+    
+    <div class="results" id="results"></div>
+  </div>
+
+  <script>
+    async function analyzePrompt() {
+      const prompt = document.getElementById('prompt').value.trim();
+      if (!prompt) {
+        alert('Please paste a prompt to analyze.');
+        return;
+      }
+      
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('results').innerHTML = '';
+      
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.error || 'Unknown error');
+        }
+        
+        // Display results
+        let html = '<div class="success">';
+        html += '<div class="score">Score: ' + data.overall_score + ' / 100</div>';
+        html += '<p><strong>Verdict:</strong> ' + data.verdict + '</p>';
+        html += '<p><strong>Summary:</strong> ' + data.summary + '</p>';
+        
+        if (data.dimensions && Array.isArray(data.dimensions)) {
+          html += '<h3 style="margin-top: 1.5rem;">Dimension Scores:</h3>';
+          html += '<ul style="margin-top: 0.5rem;">';
+          for (const dim of data.dimensions) {
+            html += '<li>' + dim.name + ': <strong>' + dim.score + '/10</strong></li>';
+          }
+          html += '</ul>';
+        }
+        
+        if (data.top_recommendations && Array.isArray(data.top_recommendations)) {
+          html += '<h3 style="margin-top: 1.5rem;">Top Recommendations:</h3>';
+          html += '<ul style="margin-top: 0.5rem;">';
+          for (const rec of data.top_recommendations) {
+            html += '<li>' + rec + '</li>';
+          }
+          html += '</ul>';
+        }
+        
+        if (data.improved_prompt) {
+          html += '<h3 style="margin-top: 1.5rem;">Improved Prompt:</h3>';
+          html += '<textarea readonly style="margin-top: 0.5rem;">' + data.improved_prompt + '</textarea>';
+        }
+        
+        html += '</div>';
+        document.getElementById('results').innerHTML = html;
+      } catch (err) {
+        document.getElementById('results').innerHTML = '<div class="error">Error: ' + err.message + '</div>';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>`);
 });
 
+// Catch all for SPA
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'prompt-rater/public/index.html'));
+  res.redirect('/');
 });
 
 export default app;
+
 
 
 
